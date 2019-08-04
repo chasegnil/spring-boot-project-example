@@ -278,8 +278,9 @@ public class MailUtil {
     }
 
     private static String[] convertCollectionToArray(Collection<String> c){
-        String[] result = null;
-
+        String[] result = new String[]{};
+        if (CollectionUtils.isEmpty(c))
+            return result;
         Iterator<String> iterator = c.iterator();
         if (iterator.hasNext()){
             String s = iterator.next();
@@ -293,7 +294,7 @@ public class MailUtil {
             result = c.toArray(result);
         }
 
-        return result == null ? new String[]{} : result;
+        return result;
     }
 
 }
