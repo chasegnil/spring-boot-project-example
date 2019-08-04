@@ -257,24 +257,24 @@ public class MailUtil {
         if (StringUtils.isEmpty(deliver))
             throw new IllegalArgumentException("deliver can not be empty");
         if (CollectionUtils.isEmpty(receivers))
-            throw new IllegalArgumentException("receivers can not empty");
+            throw new IllegalArgumentException("receivers can not be empty");
         if (StringUtils.isEmpty(subject))
-            throw new IllegalArgumentException("subject can not empty");
+            throw new IllegalArgumentException("subject can not be empty");
         if (StringUtils.isEmpty(content))
-            throw new IllegalArgumentException("content can not empty");
+            throw new IllegalArgumentException("content can not be empty");
     }
 
     private static void checkEmpty(String deliver, Collection<String> receivers, String subject, String template, Context context) {
         if (StringUtils.isEmpty(deliver))
             throw new IllegalArgumentException("deliver can not be empty");
         if (CollectionUtils.isEmpty(receivers))
-            throw new IllegalArgumentException("receivers can not empty");
+            throw new IllegalArgumentException("receivers can not be empty");
         if (StringUtils.isEmpty(subject))
-            throw new IllegalArgumentException("subject can not empty");
+            throw new IllegalArgumentException("subject can not be empty");
         if (StringUtils.isEmpty(template))
-            throw new IllegalArgumentException("template can not empty");
+            throw new IllegalArgumentException("template can not be empty");
         if (StringUtils.isEmpty(context))
-            throw new IllegalArgumentException("context can not empty");
+            throw new IllegalArgumentException("context can not be empty");
     }
 
     private static String[] convertCollectionToArray(Collection<String> c){
