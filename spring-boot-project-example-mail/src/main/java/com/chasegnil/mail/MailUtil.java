@@ -1,5 +1,6 @@
 package com.chasegnil.mail;
 
+import org.apache.commons.collections4.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -8,6 +9,7 @@ import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
 
@@ -19,6 +21,7 @@ import java.util.*;
 /**
  * 邮件工具类
  */
+@SuppressWarnings("unused")
 @Component
 public class MailUtil {
 
@@ -54,17 +57,23 @@ public class MailUtil {
      * @param subject 邮件主题
      * @param content 邮件内容
      */
-    public void sendSimpleMail(String deliver, Set<String> receivers, Set<String> carbonCopys, String subject, String content){
+    @SuppressWarnings("Duplicates")
+    public void sendSimpleMail(String deliver, Collection<String> receivers, Collection<String> carbonCopys, String subject, String content){
+        checkEmpty(deliver, receivers, subject, content);
+        Set<String> receiversSet = new HashSet<>(receivers);
+        Set<String> carbonCopysSet = new HashSet<>();
+        if (CollectionUtils.isNotEmpty(carbonCopys)) {
+            carbonCopysSet.addAll(carbonCopys);
+            carbonCopysSet.removeAll(receiversSet);
+        }
+
         long startTimestamp  = System.currentTimeMillis();
         logger.info("Start send Mail...");
-        if (carbonCopys != null)
-            carbonCopys.removeAll(receivers);
-
         try {
             SimpleMailMessage message = new SimpleMailMessage();
             message.setFrom(deliver);
-            message.setTo(this.convertCollectionToArray(receivers));
-            message.setCc(this.convertCollectionToArray(carbonCopys));
+            message.setTo(convertCollectionToArray(receiversSet));
+            message.setCc(convertCollectionToArray(carbonCopysSet));
             message.setSubject(subject);
             message.setText(content);
             mailSender.send(message);
@@ -101,19 +110,24 @@ public class MailUtil {
      * @param content 邮件内容
      * @param isHtml 内容是否是否是Html格式
      */
-    public void sendHtmlMail(String deliver, Set<String> receivers, Set<String> carbonCopys, String subject, String content, boolean isHtml){
+    @SuppressWarnings("Duplicates")
+    public void sendHtmlMail(String deliver, Collection<String> receivers, Collection<String> carbonCopys, String subject, String content, boolean isHtml){
+        checkEmpty(deliver, receivers, subject, content);
+        Set<String> receiversSet = new HashSet<>(receivers);
+        Set<String> carbonCopysSet = new HashSet<>();
+        if (CollectionUtils.isNotEmpty(carbonCopys)) {
+            carbonCopysSet.addAll(carbonCopys);
+            carbonCopysSet.removeAll(receiversSet);
+        }
+
         long startTimestamp  = System.currentTimeMillis();
         logger.info("Start send Mail...");
-
-        if (carbonCopys != null)
-            carbonCopys.removeAll(receivers);
-
         try {
             MimeMessage message = mailSender.createMimeMessage();
             MimeMessageHelper messageHelper = new MimeMessageHelper(message);
             messageHelper.setFrom(deliver);
-            messageHelper.setTo(this.convertCollectionToArray(receivers));
-            messageHelper.setCc(this.convertCollectionToArray(carbonCopys));
+            messageHelper.setTo(convertCollectionToArray(receiversSet));
+            messageHelper.setCc(convertCollectionToArray(carbonCopysSet));
             messageHelper.setSubject(subject);
             messageHelper.setText(content, isHtml);
             mailSender.send(message);
@@ -154,19 +168,25 @@ public class MailUtil {
      * @param fileName 文件名
      * @param file 文件
      */
-    public void sendAttachmentFileMail(String deliver, Set<String> receivers, Set<String> carbonCopys, String subject, String content, boolean isHtml, String fileName, File file){
+    @SuppressWarnings("Duplicates")
+    public void sendAttachmentFileMail(String deliver, Collection<String> receivers, Collection<String> carbonCopys, String subject, String content, boolean isHtml, String fileName, File file){
+        checkEmpty(deliver, receivers, subject, content);
+        Set<String> receiversSet = new HashSet<>(receivers);
+        Set<String> carbonCopysSet = new HashSet<>();
+        if (CollectionUtils.isNotEmpty(carbonCopys)) {
+            carbonCopysSet.addAll(carbonCopys);
+            carbonCopysSet.removeAll(receiversSet);
+        }
+
         long startTimestamp  = System.currentTimeMillis();
         logger.info("Start send Mail...");
-
-        if (carbonCopys != null)
-            carbonCopys.removeAll(receivers);
 
         try {
             MimeMessage message = mailSender.createMimeMessage();
             MimeMessageHelper messageHelper = new MimeMessageHelper(message, true);
             messageHelper.setFrom(deliver);
-            messageHelper.setTo(this.convertCollectionToArray(receivers));
-            messageHelper.setCc(this.convertCollectionToArray(carbonCopys));
+            messageHelper.setTo(convertCollectionToArray(receiversSet));
+            messageHelper.setCc(convertCollectionToArray(carbonCopysSet));
             messageHelper.setSubject(subject);
             messageHelper.setText(content, isHtml);
             messageHelper.addAttachment(fileName, file);
@@ -204,20 +224,25 @@ public class MailUtil {
      * @param template 模板地址
      * @param context 邮件内容
      */
-    public void sendTemplateMail(String deliver, Set<String> receivers, Set<String> carbonCopys, String subject, String template, Context context){
+    @SuppressWarnings("Duplicates")
+    public void sendTemplateMail(String deliver, Collection<String> receivers, Collection<String> carbonCopys, String subject, String template, Context context){
+        checkEmpty(deliver, receivers, subject, template, context);
+        Set<String> receiversSet = new HashSet<>(receivers);
+        Set<String> carbonCopysSet = new HashSet<>();
+        if (CollectionUtils.isNotEmpty(carbonCopys)) {
+            carbonCopysSet.addAll(carbonCopys);
+            carbonCopysSet.removeAll(receiversSet);
+        }
+
         long startTimestamp  = System.currentTimeMillis();
         logger.info("Start send Mail...");
-
-        if (carbonCopys != null)
-            carbonCopys.removeAll(receivers);
-
         try {
             MimeMessage message = mailSender.createMimeMessage();
             MimeMessageHelper messageHelper = new MimeMessageHelper(message);
             String content = templateEngine.process(template, context);
             messageHelper.setFrom(deliver);
-            messageHelper.setTo(this.convertCollectionToArray(receivers));
-            messageHelper.setCc(this.convertCollectionToArray(carbonCopys));
+            messageHelper.setTo(convertCollectionToArray(receiversSet));
+            messageHelper.setCc(convertCollectionToArray(carbonCopysSet));
             messageHelper.setSubject(subject);
             messageHelper.setText(content, true);
             mailSender.send(message);
@@ -228,7 +253,31 @@ public class MailUtil {
         }
     }
 
-    private String[] convertCollectionToArray(Collection<String> c){
+    private static void checkEmpty(String deliver, Collection<String> receivers, String subject, String content) {
+        if (StringUtils.isEmpty(deliver))
+            throw new IllegalArgumentException("deliver can not be empty");
+        if (CollectionUtils.isEmpty(receivers))
+            throw new IllegalArgumentException("receivers can not empty");
+        if (StringUtils.isEmpty(subject))
+            throw new IllegalArgumentException("subject can not empty");
+        if (StringUtils.isEmpty(content))
+            throw new IllegalArgumentException("content can not empty");
+    }
+
+    private static void checkEmpty(String deliver, Collection<String> receivers, String subject, String template, Context context) {
+        if (StringUtils.isEmpty(deliver))
+            throw new IllegalArgumentException("deliver can not be empty");
+        if (CollectionUtils.isEmpty(receivers))
+            throw new IllegalArgumentException("receivers can not empty");
+        if (StringUtils.isEmpty(subject))
+            throw new IllegalArgumentException("subject can not empty");
+        if (StringUtils.isEmpty(template))
+            throw new IllegalArgumentException("template can not empty");
+        if (StringUtils.isEmpty(context))
+            throw new IllegalArgumentException("context can not empty");
+    }
+
+    private static String[] convertCollectionToArray(Collection<String> c){
         String[] result = null;
 
         Iterator<String> iterator = c.iterator();
@@ -238,7 +287,7 @@ public class MailUtil {
                 iterator.remove();
         }
 
-        int size = Optional.ofNullable(c).orElse(Collections.emptyList()).size();
+        int size = c.size();
         if (size > 0) {
             result = new String[size];
             result = c.toArray(result);
